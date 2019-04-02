@@ -1,7 +1,7 @@
 nuts-node-rpc-spec
 ==================
 
-Specification of models and methods used for intra node communication.  
+Specification of models and methods used for intra node communication.
 
 .. inclusion-marker-for-contribution
 

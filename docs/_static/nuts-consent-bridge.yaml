@@ -1,0 +1,164 @@
+openapi: "3.0.0"
+info:
+  title: Nuts consent bridge API spec
+  description: API specification for RPC services available at the nuts-consent-bridge
+  version: 0.1.0
+  license:
+    name: GPLv3
+paths:
+  /api/consent/event_stream:
+    post:
+      summary: Initialise a consent event steam
+      operationId: initEventStream
+      tags:
+        - consent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventStreamSetting"
+      responses:
+        '201':
+          description: Null response
+        '400':
+          description: incorrect data
+          content:
+            text/plain:
+              example:
+                epoch must be a positive value
+  /api/consent_request_state/{linearId}:
+    get:
+      operationId: getConsentRequestStateById
+      summary: Get a consent request state by its linear ID
+      tags:
+        - consent
+      parameters:
+        - name: linearId
+          in: path
+          description: The external ID as in created ConsentRequestState and event.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A ConsentRequestState object representing the Corda state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentRequestState'
+        '404':
+          description: The given ID can not be found
+  /api/attachment/{secureHash}:
+    get:
+      operationId: getAttachmentBySecureHash
+      summary: download an attachment identified by its hash
+      tags:
+        - consent
+      parameters:
+        - name: secureHash
+          in: path
+          description: The secure hash of the attachment bytes.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A bytes stream representing the zip file
+          content:
+            application/octet-stream:
+        '404':
+          description: The given hash can not be found
+  /api/consent/accept_consent_request:
+    post:
+      summary: Accept a consent request state. This means a Care provider lets the Nuts node know
+        that the patient mentioned in the attachment is also a patient for that care provider.
+        The creation of the signature will be done in the Corda node, since its private key is known there.
+      operationId: acceptConsentRequestState
+      tags:
+        - consent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptConsentRequestState"
+      responses:
+        '201':
+          description: Null response
+        '400':
+          description: incorrect data
+          content:
+            text/plain:
+              example:
+                externalID not found
+components:
+  schemas:
+    EventStreamSetting:
+      required:
+        - topic
+        - epoch
+      properties:
+        topic:
+          type: string
+        epoch:
+          type: integer
+    ConsentRequestState:
+      required:
+        - externalId
+        - attachments
+        - signatures
+        - parties
+      properties:
+        externalId:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: string
+            description: Base64 SecureHash values
+        signatures:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/PartySignatureAttachment'
+        parties:
+          type: array
+          items:
+            type: string
+            description: X500 Corda node name
+            example: O=Nuts, C=NL, L=Groenlo
+    PartySignatureAttachment:
+      required:
+        - party
+        - attachment
+        - signature
+      properties:
+        party:
+          type: string
+          example: O=Nuts, C=NL, L=Groenlo
+        attachment:
+          type: string
+          description: Base64 SecureHash value
+        signature:
+          type: object
+          $ref: '#/components/schemas/SignatureWithKey'
+    SignatureWithKey:
+      required:
+        - publicKey
+        - data
+      properties:
+        publicKey:
+          type: string
+          description: pem encoded public key
+        data:
+          type: string
+          description: base64 encoded bytes
+    AcceptConsentRequestState:
+      required:
+        - externalId
+        - attachment
+      properties:
+        externalId:
+          type: string
+        attachment:
+          type: string
+          description: Base64 SecureHash value
