@@ -66,6 +66,9 @@ paths:
           description: A bytes stream representing the zip file
           content:
             application/octet-stream:
+              schema:
+                type: string
+                format: binary
         '404':
           description: The given hash can not be found
   /api/consent/accept_consent_request:
