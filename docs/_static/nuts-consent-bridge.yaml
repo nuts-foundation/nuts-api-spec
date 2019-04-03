@@ -13,19 +13,25 @@ paths:
       tags:
         - consent
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/EventStreamSetting"
       responses:
-        '201':
-          description: Null response
+        '200':
+          description: OK response
+          content:
+            text/plain:
+              schema:
+                type: string
         '400':
           description: incorrect data
           content:
             text/plain:
-              example:
-                epoch must be a positive value
+              example: epoch must be a positive value
+              schema:
+                type: string
   /api/consent_request_state/{linearId}:
     get:
       operationId: getConsentRequestStateById
@@ -85,8 +91,12 @@ paths:
             schema:
               $ref: "#/components/schemas/AcceptConsentRequestState"
       responses:
-        '201':
-          description: Null response
+        '200':
+          description: Dummy response
+          content:
+            text/plain:
+              schema:
+                type: string
         '400':
           description: incorrect data
           content:
@@ -104,6 +114,7 @@ components:
           type: string
         epoch:
           type: integer
+          format: int64
     ConsentRequestState:
       required:
         - externalId
