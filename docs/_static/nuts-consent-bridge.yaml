@@ -32,16 +32,16 @@ paths:
               example: epoch must be a positive value
               schema:
                 type: string
-  /api/consent_request_state/{linearId}:
+  /api/consent_request_state/{UUID}:
     get:
       operationId: getConsentRequestStateById
-      summary: Get a consent request state by its linear ID
+      summary: Get a consent request state by its UUID
       tags:
         - consent
       parameters:
-        - name: linearId
+        - name: UUID
           in: path
-          description: The external ID as in created ConsentRequestState and event.
+          description: The UUID as in created ConsentRequestState and event.
           required: true
           schema:
             type: string
@@ -73,7 +73,6 @@ paths:
           content:
             application/octet-stream:
               schema:
-                type: string
                 format: binary
         '404':
           description: The given hash can not be found
@@ -86,6 +85,7 @@ paths:
       tags:
         - consent
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -117,41 +117,35 @@ components:
           format: int64
     ConsentRequestState:
       required:
-        - externalId
+        - consentId
         - attachments
         - signatures
-        - parties
       properties:
-        externalId:
-          type: string
+        consentId:
+          type: object
+          $ref: '#/components/schemas/ConsentId'
         attachments:
           type: array
           items:
             type: string
-            description: Base64 SecureHash values
+            description: Hexidecimal SecureHash values
         signatures:
           type: array
           items:
             type: object
-            $ref: '#/components/schemas/PartySignatureAttachment'
-        parties:
-          type: array
-          items:
-            type: string
-            description: X500 Corda node name
-            example: O=Nuts, C=NL, L=Groenlo
-    PartySignatureAttachment:
+            $ref: '#/components/schemas/PartyAttachmentSignature'
+    PartyAttachmentSignature:
       required:
-        - party
+        - legalEntityURI
         - attachment
         - signature
       properties:
-        party:
+        legalEntityURI:
           type: string
-          example: O=Nuts, C=NL, L=Groenlo
+          example: https://nuts.nl/identities/agbcode#00000007
         attachment:
           type: string
-          description: Base64 SecureHash value
+          description: Hexidecimal SecureHash value
         signature:
           type: object
           $ref: '#/components/schemas/SignatureWithKey'
@@ -168,11 +162,22 @@ components:
           description: base64 encoded bytes
     AcceptConsentRequestState:
       required:
+        - consentId
+        - partyAttachmentSignature
+      properties:
+        consentId:
+          type: object
+          $ref: '#/components/schemas/ConsentId'
+        partyAttachmentSignature:
+          type: object
+          $ref: '#/components/schemas/PartyAttachmentSignature'
+    ConsentId:
+      required:
         - externalId
-        - attachment
+        - UUID
       properties:
         externalId:
           type: string
-        attachment:
+        UUID:
           type: string
-          description: Base64 SecureHash value
+          description: Unique identifier assigned by the consent cordapp
