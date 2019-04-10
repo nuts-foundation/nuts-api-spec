@@ -32,14 +32,14 @@ paths:
               example: epoch must be a positive value
               schema:
                 type: string
-  /api/consent_request_state/{UUID}:
+  /api/consent_request_state/{uuid}:
     get:
       operationId: getConsentRequestStateById
       summary: Get a consent request state by its UUID
       tags:
         - consent
       parameters:
-        - name: UUID
+        - name: uuid
           in: path
           description: The UUID as in created ConsentRequestState and event.
           required: true
@@ -76,20 +76,85 @@ paths:
                 format: binary
         '404':
           description: The given hash can not be found
-  /api/consent/accept_consent_request:
+  /api/consent/consent_request:
     post:
-      summary: Accept a consent request state. This means a Care provider lets the Nuts node know
-        that the patient mentioned in the attachment is also a patient for that care provider.
-        The creation of the signature will be done in the Corda node, since its private key is known there.
-      operationId: acceptConsentRequestState
+      summary: Create a new consent request state.
+      operationId: newConsentRequestState
       tags:
         - consent
       requestBody:
         required: true
         content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                consentRequestMetadata:
+                  type: object
+                  $ref: '#/components/schemas/ConsentRequestMetadata'
+                attachment:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Dummy response
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: incorrect data
+          content:
+            text/plain:
+              example:
+                invalid metadata
+  /api/consent/consent_request/{uuid}/accept:
+    post:
+      summary: Accept a consent request state. This means a Care provider lets the Nuts node know
+        that the patient mentioned in the attachment is also a patient for that care provider.
+      operationId: acceptConsentRequestState
+      tags:
+        - consent
+      parameters:
+        - name: uuid
+          in: path
+          description: The Unique ID of the consent request record
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AcceptConsentRequestState"
+              $ref: "#/components/schemas/PartyAttachmentSignature"
+      responses:
+        '200':
+          description: Dummy response
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: incorrect data
+          content:
+            text/plain:
+              example:
+                externalID not found
+  /api/consent/consent_request/{uuid}/finalize:
+    post:
+      summary: Finalize a consent request state. This means a Care provider lets the Nuts node know
+        that all checks have been done and that this request can be promoted to a consent record.
+      operationId: finalizeConsentRequestState
+      tags:
+        - consent
+      parameters:
+        - name: uuid
+          in: path
+          description: The Unique ID of the consent request record
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Dummy response
@@ -160,17 +225,72 @@ components:
         data:
           type: string
           description: base64 encoded bytes
-    AcceptConsentRequestState:
+    ConsentRequestMetadata:
       required:
-        - consentId
-        - partyAttachmentSignature
+        - externalId
+        - metadata
       properties:
-        consentId:
+        externalId:
+          type: string
+        metadata:
           type: object
-          $ref: '#/components/schemas/ConsentId'
-        partyAttachmentSignature:
+          $ref: '#/components/schemas/Metadata'
+    Metadata:
+      required:
+        - domain
+        - secureKey
+        - organisationSecureKeys
+        - period
+      properties:
+        domain:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/Domain'
+        secureKey:
           type: object
-          $ref: '#/components/schemas/PartyAttachmentSignature'
+          $ref: '#/components/schemas/SymmetricKey'
+        organisationSecureKeys:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/ASymmetricKey'
+        period:
+          type: object
+          $ref: '#/components/schemas/Period'
+    Domain:
+      type: string
+      enum: ["medical", "pgo", "insurance"]
+    SymmetricKey:
+      required:
+        - alg
+        - iv
+      properties:
+        alg:
+          type: string
+        iv:
+          type: string
+    ASymmetricKey:
+      required:
+        - legalEntityURI
+      properties:
+        legalEntityURI:
+          type: string
+        alg:
+          type: string
+        cipherText:
+          type: string
+          description: base64 encoded
+    Period:
+      required:
+        - validFrom
+      properties:
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
     ConsentId:
       required:
         - externalId
