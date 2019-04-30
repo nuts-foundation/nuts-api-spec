@@ -1,9 +1,9 @@
 .. _nuts-node-rpc-spec:
 
-Welcome to Nuts node RPC specification's documentation!
-=======================================================
+Welcome to Nuts node RPC specification documentation!
+=====================================================
 
-This documentation site contains all API definitions used in intra node communication. It is structured based on the services hosting the API's.
+This documentation site contains all API definitions used in intra node communication.
 
 .. toctree::
     :maxdepth: 2
