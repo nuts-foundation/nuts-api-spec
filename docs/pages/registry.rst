@@ -1,7 +1,7 @@
-.. nuts-node-rpc-consent:
+.. nuts-node-rpc-registry:
 
-Consent API's
-=============
+Registry API's
+==============
 
 .. todo: link to other documentation when available
 
