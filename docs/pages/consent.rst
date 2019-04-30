@@ -1,4 +1,4 @@
-.. nuts-node-rpc-consent:
+.. _nuts-node-rpc-consent:
 
 Consent API's
 =============

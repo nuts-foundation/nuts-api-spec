@@ -1,4 +1,4 @@
-.. nuts-node-rpc-registry:
+.. _nuts-node-rpc-registry:
 
 Registry API's
 ==============
