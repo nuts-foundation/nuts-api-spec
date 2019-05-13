@@ -268,7 +268,7 @@ components:
       properties:
         legalEntityURI:
           type: string
-          example: "https://nuts.nl/CodeSystem/agbcode#00000000"
+          example: "https://nuts.nl/identities/agbcode#00000000"
         alg:
           type: string
         cipherText:
