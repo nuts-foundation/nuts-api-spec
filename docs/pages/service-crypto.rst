@@ -1,4 +1,4 @@
-.. _nuts-service-node-rpc-consent:
+.. _nuts-service-crypto:
 
 Service crypto API's
 ===========================
