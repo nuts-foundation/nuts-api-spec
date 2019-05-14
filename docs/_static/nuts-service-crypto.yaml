@@ -1,0 +1,187 @@
+openapi: "3.0.0"
+info:
+  title: Nuts service crypto spec
+  description: API specification for crypto services available within nuts service space
+  version: 0.1.0
+  license:
+    name: GPLv3
+paths:
+  /crypto/generate:
+    post:
+      summary: "Send a request for checking if the given combination has valid consent"
+      operationId: generateKeyPair
+      tags:
+        - crypto
+      parameters:
+        - name:  legalEntityURI
+          in: query
+          description: "URI identifying the legal entity"
+          required: true
+          schema:
+            $ref: "#/components/schemas/LegalEntityURI"
+      responses:
+        '201':
+          description: "Key has been created successfully"
+        '400':
+          description: "Invalid request"
+          content:
+            text/plain:
+              example: "Invalid URI"
+              schema:
+                type: string
+  /crypto/encrypt:
+    post:
+      summary: "encrypt a piece of data for the given legalEntity or public key"
+      operationId: encrypt
+      tags:
+        - crypto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EncryptRequest'
+      responses:
+        '200':
+          description: "OK response, body holds encrypted symmetric key and cipherText"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncryptResponse'
+        '400':
+          description: incorrect data
+          content:
+            text/plain:
+              example:
+                invalid metadata
+  /crypto/decrypt:
+    post:
+      summary: "decrypt a cipherText for the given legalEntity"
+      operationId: decrypt
+      tags:
+        - crypto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecryptRequest'
+      responses:
+        '200':
+          description: "OK response, body holds base64 encoded plainText"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecryptResponse'
+        '400':
+          description: incorrect data
+          content:
+            text/plain:
+              example:
+                invalid metadata
+  /crypto/external_id:
+    post:
+      summary: "calculate an externalId for an identifier for a given legalEntity"
+      operationId: externalId
+      tags:
+        - crypto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalIdRequest'
+      responses:
+        '200':
+          description: "OK response, body holds hex encoded hash"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalIdResponse'
+        '400':
+          description: incorrect data
+          content:
+            text/plain:
+              example:
+                invalid metadata
+components:
+  schemas:
+    EncryptRequest:
+      description: "EncryptRequest either has a publicKey or legalEntityURI, not both"
+      required:
+        - legalEntityURI
+        - plainText
+        - publicKey
+      properties:
+        legalEntityURI:
+          $ref: "#/components/schemas/LegalEntityURI"
+        plainText:
+          type: string
+          description: "Base64 encoded binary data"
+        publicKey:
+          type: string
+          description: "PEM encoded public key"
+    EncryptResponse:
+      required:
+        - cipherText
+        - cipherTextKey
+        - nonce
+      properties:
+        cipherText:
+          type: string
+          description: "Base64 encoded encrypted text"
+        cipherTextKey:
+          type: string
+          description: "Base64 encoded encrypted key"
+        nonce:
+          type: string
+          description: "Base64 encoded nonce"
+    DecryptRequest:
+      required:
+        - legalEntityURI
+        - cipherText
+        - cipherTextKey
+        - nonce
+      properties:
+        legalEntityURI:
+          $ref: "#/components/schemas/LegalEntityURI"
+        cipherText:
+          type: string
+          description: "Base64 encoded cipherText"
+        cipherTextKey:
+          type: string
+          description: "base64 encoded encrypted symmetric key"
+        nonce:
+          type: string
+          description: "base64 encoded nonce"
+    DecryptResponse:
+      required:
+        - plainText
+      properties:
+        plainText:
+          type: string
+          description: "Base64 encoded plain text"
+    ExternalIdRequest:
+      required:
+        - legalEntityURI
+        - subjectURI
+      properties:
+        legalEntityURI:
+          $ref: "#/components/schemas/LegalEntityURI"
+        subjectURI:
+          $ref: "#/components/schemas/SubjectURI"
+    ExternalIdResponse:
+      required:
+        - externalId
+      properties:
+        externalId:
+          type: string
+          description: "hex encoded identifier"
+    LegalEntityURI:
+      type: string
+      description: "URI defining an organization, usually the custodian or actor"
+      example: "https://nuts.nl/identities/agb#00000000"
+    SubjectURI:
+      type: string
+      description: "URI defining the data subject, usually the patient"
+      example: "https://nuts.nl/identities/bsn#999999990"
