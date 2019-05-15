@@ -1,0 +1,94 @@
+openapi: "3.0.0"
+info:
+  title: Nuts service crypto spec
+  description: API specification for crypto services available within nuts service space
+  version: 0.1.0
+  license:
+    name: GPLv3
+paths:
+  /consent/validate:
+    post:
+      summary: "Send a fhir consent record for validation. If valid the result will also include all accessible resources."
+      operationId: validate
+      tags:
+        - consent
+      requestBody:
+        required: true
+        content:
+          application/json+fhir:
+
+      responses:
+        '200':
+          description: "Request has been parsed. Result object holds outcome, errors and/or accessible resources."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+        '400':
+          description: incorrect data
+          content:
+            text/plain:
+              example:
+                no request body
+components:
+  schemas:
+    ValidationResponse:
+      description: "Result of validation request with the outcome"
+      required:
+        - outcome
+      properties:
+        outcome:
+          type: string
+          enum: ["valid", "invalid"]
+        validationErrors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationError"
+        consentEntries:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConsentEntry"
+    ValidationError:
+      description: "Error that occurred while validating the given consent record"
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          enum: ["syntax", "constraint", "policy"]
+          description: "Type of error: syntax (json is broken), constraint (json is not a valid fhir resource), policy (current Nuts node settings do not allow this record)"
+        message:
+          type: string
+          description: "The actual error"
+    ConsentEntry:
+      description: "Entry defining subject, custodian, actor and resource"
+      required:
+        - actor
+        - custodian
+        - resources
+        - subject
+      properties:
+        actor:
+          $ref: "#/components/schemas/ActorURI"
+        custodian:
+          $ref: "#/components/schemas/CustodianyURI"
+        resources:
+          description: "Array of fhir resources"
+          type: array
+          items:
+            type: string
+        subject:
+          $ref: "#/components/schemas/SubjectURI"
+    ActorURI:
+      type: string
+      description: "URI defining the actor, usually a practitioner"
+      example: "https://nuts.nl/identities/agb#00000007"
+    CustodianyURI:
+      type: string
+      description: "URI defining an organization, usually the custodian or actor"
+      example: "https://nuts.nl/identities/agb#00000000"
+    SubjectURI:
+      type: string
+      description: "URI defining the data subject, usually the patient"
+      example: "https://nuts.nl/identities/bsn#999999990"
