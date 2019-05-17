@@ -17,6 +17,7 @@ paths:
           in: path
           description: URI identifier
           required: true
+          example: https://nuts.nl/identities/agb#00000007
           schema:
             type: string
       responses:
