@@ -15,8 +15,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/json+fhir:
-
+          application/json:
+            schema:
+              type: string
       responses:
         '200':
           description: "Request has been parsed. Result object holds outcome, errors and/or accessible resources."
@@ -44,10 +45,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ValidationError"
-        consentEntries:
-          type: array
-          items:
-            $ref: "#/components/schemas/ConsentEntry"
+        consent:
+          $ref: "#/components/schemas/SimplifiedConsent"
     ValidationError:
       description: "Error that occurred while validating the given consent record"
       required:
@@ -61,16 +60,18 @@ components:
         message:
           type: string
           description: "The actual error"
-    ConsentEntry:
-      description: "Entry defining subject, custodian, actor and resource"
+    SimplifiedConsent:
+      description: "Simplified consent record"
       required:
-        - actor
+        - actors
         - custodian
         - resources
         - subject
       properties:
-        actor:
-          $ref: "#/components/schemas/ActorURI"
+        actors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActorURI"
         custodian:
           $ref: "#/components/schemas/CustodianyURI"
         resources:
