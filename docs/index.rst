@@ -14,7 +14,7 @@ Back to main documentation: :ref:`nuts-documentation`
     <script src='_static/js/swagger-ui-bundle-3.18.3.js' type='text/javascript'></script>
     <script src='_static/js/swagger-ui-standalone-preset-3.18.3.js' type='text/javascript'></script>
     <script>
-        version = "{{ readthedocs.v1.version }}";
+        version = "{{ rtd_version }}";
 
         function HideTopbarPlugin() {
           // this plugin overrides the Topbar component to return nothing
