@@ -38,78 +38,8 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                involvedParties:
-                  type: object
-                  required:
-                    - patient
-                    - custodian
-                    - others
-                  properties:
-                    subject:
-                      type: string
-                      example: "https://nuts.nl/identities/bsn#999999990"
-                      description: >
-                        The id that refers to the patient.
-                    custodian:
-                      description: >
-                        The organizationId of the the custodian of the data.
-                      type: string
-                      example: "https://nuts.nl/identities/agb#00000000"
-                    actors:
-                      description: >
-                        A list of organizationIds which may access the patients
-                        data. These organizations will take part in the consent
-                        synchronization transactions.
-                      type: array
-                      items:
-                        type: string
-                        example:
-                          - "https://nuts.nl/identities/agb#00000001"
-                          - "https://nuts.nl/identities/agb#00000002"
-                meta:
-                  type: object
-                  properties:
-                    performerIdentity:
-                      description: >
-                        A cryptographic identiy of the performer, the
-                        person who administers the consent. This field is
-                        optional. If no performer can be identified the
-                        consentProof field is mandatory.
-                      type: object
-                      properties:
-                        contract:
-                          type: string
-                          description: Base64 encoded contract which contains the identity of the performer.
-                          example: dmFsaWQgaXJtYSBjb250cmFjdA==
-                        contentType:
-                          type: string
-                          description: The contentType of the contract
-                          example: 'application/json+irma'
-                    consentProof:
-                      type: object
-                      description: The proof of the consent. E.g. a scan of a signed document, signed pdf or irma proof.
-                      properties:
-                        contentType:
-                          type: string
-                          example: 'application/pdf'
-                          description: The mime-type of the proof
-                        data:
-                          type: string
-                          example: cGRmIGRvY3VtZW50IHdpdGggc2lnbmF0dXJl
-                          description: base64 encoded proof
-                    period:
-                      type: object
-                      properties:
-                        start:
-                          type: string
-                          format: date-time
-                          example: "2019-05-20T17:02:33+10:00"
-                        end:
-                          type: string
-                          format: date-time
-                          example: "2019-11-20T17:02:33+10:00"
+              $ref: '#/components/schemas/CreateConsentRequest'
+
       responses:
         202:
           description: |
@@ -118,13 +48,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  resultCode:
-                    type: string
-                    enum: ["OK", "NOK"]
-                  jobId:
-                    type: string
-                    example: '123'
+                $ref: '#/components/schemas/JobCreatedResponse'
   '/api/consent/validation':
     post:
       summary: Create the validity of a consent-request job
@@ -145,22 +69,101 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                consentId:
-                  type: string
-                  example: '87203b8f5b23f04c20b645b1121c6ed561b2d45c1d903083332b8b98ce0f7f10bc6bd7b2094bf8287a72246c3c1c318811e022b183eac9d1e1a4fcadeeb2c9e9'
+              $ref: '#/components/schemas/ConsentValidationRequest'
       responses:
         '200':
           description: Validation job created.
           content:
             'application/json':
               schema:
-                type: object
-                properties:
-                  resultCode:
-                    type: string
-                    enum: ["OK", "NOK"]
-                  jobId:
-                    type: string
-                    example: '123'
+                $ref: '#/components/schemas/JobCreatedResponse'
+components:
+  schemas:
+    JobCreatedResponse:
+      type: object
+      properties:
+        resultCode:
+          type: string
+          enum: ["OK", "NOK"]
+        jobId:
+          type: string
+          example: '123'
+    ConsentValidationRequest:
+      type: object
+      properties:
+        consentId:
+          type: string
+          example: '87203b8f5b23f04c20b645b1121c6ed561b2d45c1d903083332b8b98ce0f7f10bc6bd7b2094bf8287a72246c3c1c318811e022b183eac9d1e1a4fcadeeb2c9e9'
+    CreateConsentRequest:
+      type: object
+      properties:
+        involvedParties:
+          type: object
+          required:
+            - patient
+            - custodian
+            - others
+          properties:
+            subject:
+              type: string
+              example: "https://nuts.nl/identities/bsn#999999990"
+              description: >
+                The id that refers to the patient.
+            custodian:
+              description: >
+                The organizationId of the the custodian of the data.
+              type: string
+              example: "https://nuts.nl/identities/agb#00000000"
+            actors:
+              description: >
+                A list of organizationIds which may access the patients
+                data. These organizations will take part in the consent
+                synchronization transactions.
+              type: array
+              items:
+                type: string
+                example:
+                  - "https://nuts.nl/identities/agb#00000001"
+                  - "https://nuts.nl/identities/agb#00000002"
+        meta:
+          type: object
+          properties:
+            performerIdentity:
+              description: >
+                A cryptographic identiy of the performer, the
+                person who administers the consent. This field is
+                optional. If no performer can be identified the
+                consentProof field is mandatory.
+              type: object
+              properties:
+                contract:
+                  type: string
+                  description: Base64 encoded contract which contains the identity of the performer.
+                  example: dmFsaWQgaXJtYSBjb250cmFjdA==
+                contentType:
+                  type: string
+                  description: The contentType of the contract
+                  example: 'application/json+irma'
+            consentProof:
+              type: object
+              description: The proof of the consent. E.g. a scan of a signed document, signed pdf or irma proof.
+              properties:
+                contentType:
+                  type: string
+                  example: 'application/pdf'
+                  description: The mime-type of the proof
+                data:
+                  type: string
+                  example: cGRmIGRvY3VtZW50IHdpdGggc2lnbmF0dXJl
+                  description: base64 encoded proof
+            period:
+              type: object
+              properties:
+                start:
+                  type: string
+                  format: date-time
+                  example: "2019-05-20T17:02:33+10:00"
+                end:
+                  type: string
+                  format: date-time
+                  example: "2019-11-20T17:02:33+10:00"
