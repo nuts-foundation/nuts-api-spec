@@ -191,3 +191,8 @@ epub_exclude_files = ['search.html']
 
 def setup(app):
     app.add_stylesheet('css/swagger-ui.css')
+
+rst_epilog = """
+.. |version| replace:: {0}
+""".format(rtd_version)
+
