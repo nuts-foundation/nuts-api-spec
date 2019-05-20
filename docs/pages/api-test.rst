@@ -9,8 +9,7 @@ API overview
         var ui = SwaggerUIBundle({
             url: "../_static/nuts-consent-bridge.yaml",
             presets: [
-                SwaggerUIBundle.presets.apis,
-                SwaggerUIStandalonePreset
+                SwaggerUIBundle.presets.apis
             ],
         });
 
