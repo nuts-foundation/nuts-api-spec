@@ -193,6 +193,6 @@ def setup(app):
     app.add_stylesheet('css/swagger-ui.css')
 
 rst_prolog = """
-.. |version| replace:: {0}
+  .. |version| replace:: {0}
 """.format(rtd_version)
 
