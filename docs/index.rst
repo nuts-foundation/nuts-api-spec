@@ -19,6 +19,7 @@ Back to main documentation: :ref:`nuts-documentation`
                 "dom_id": "#swagger-ui",
                 urls: [
                     {url: "_static/nuts-consent-bridge.yaml", name: "consent-bridge"},
+                    {url: "_static/nuts-consent-logic.yaml", name: "consent-logic"},
                     {url: "_static/nuts-fhir-validation.yaml", name: "fhir-validation"},
                     {url: "_static/nuts-registry.yaml", name: "nuts-registry"},
                     {url: "_static/nuts-service-crypto.yaml", name: "crypto"},
