@@ -15,7 +15,8 @@ API overview
                 url: "../_static/nuts-consent-bridge.yaml",
                 presets: [
                     SwaggerUIBundle.presets.apis,
-                    SwaggerUIStandalonePreset
+                    SwaggerUIStandalonePreset,
+                    HideTopbarPlugin
                 ],
                 layout: "StandaloneLayout"
             });
