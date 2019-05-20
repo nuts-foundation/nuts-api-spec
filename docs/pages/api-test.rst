@@ -13,6 +13,7 @@ API overview
                 SwaggerUIBundle.presets.apis,
                 SwaggerUIStandalonePreset
             ],
+            layout: "StandaloneLayout"
         });
 
         window.ui = ui
