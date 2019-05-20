@@ -122,9 +122,10 @@ components:
               type: array
               items:
                 type: string
-                example:
-                  - "https://nuts.nl/identities/agb#00000001"
-                  - "https://nuts.nl/identities/agb#00000002"
+              example:
+                - "https://nuts.nl/identities/agb#00000001"
+                - "https://nuts.nl/identities/agb#00000002"
+
         meta:
           type: object
           properties:
