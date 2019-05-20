@@ -22,11 +22,10 @@ API overview
             const ui = SwaggerUIBundle({
                 "dom_id": "#swagger-ui",
                 urls: [
-                    "../_static/nuts-consent-bridge.yaml",
-                    "../_static/nuts-fhir-validation.yaml",
-                    "../_static/nuts-registry.yaml",
-                    "../_static/nuts-service-crypto.yaml",
-                    "../_static/nuts-service-proxy-consent.yaml",
+                    {url: "../_static/nuts-consent-bridge.yaml", name: "consent-bridge"},
+                    {url: "../_static/nuts-fhir-validation.yaml", name: "fhir-validation"},
+                    {url: "../_static/nuts-registry.yaml", name: "nuts-registry"},
+                    {url: "../_static/nuts-service-crypto.yaml", name: "crypto"}
                     ],
                 presets: [
                     SwaggerUIBundle.presets.apis,
