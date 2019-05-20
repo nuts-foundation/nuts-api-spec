@@ -104,6 +104,56 @@ paths:
             text/plain:
               example:
                 invalid metadata
+  /crypto/sign:
+    post:
+      summary: "sign a piece of data with the private key of the given legalEntity"
+      operationId: sign
+      tags:
+        - crypto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRequest'
+      responses:
+        '200':
+          description: "OK response, body holds hex signature"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignResponse'
+        '400':
+          description: "incorrect data"
+          content:
+            text/plain:
+              example:
+                "unknown legalEntity"
+  /crypto/verify:
+    post:
+      summary: "verify a signature given a public key, signature and the data"
+      operationId: verify
+      tags:
+        - crypto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+      responses:
+        '200':
+          description: "OK response, body holds hex signature"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
+        '400':
+          description: "incorrect data"
+          content:
+            text/plain:
+              example:
+                "missing signature"
 components:
   schemas:
     EncryptRequest:
@@ -119,8 +169,7 @@ components:
           type: string
           description: "Base64 encoded binary data"
         publicKey:
-          type: string
-          description: "PEM encoded public key"
+          $ref: '#/components/schemas/PublicKey'
     EncryptResponse:
       required:
         - cipherText
@@ -177,10 +226,51 @@ components:
         externalId:
           type: string
           description: "hex encoded identifier"
+    SignRequest:
+      required:
+        - plainText
+        - legalEntityURI
+      properties:
+        legalEntityURI:
+          $ref: "#/components/schemas/LegalEntityURI"
+        plainText:
+          type: string
+          description: "Base64 encoded data"
+    SignResponse:
+      required:
+        - signature
+      properties:
+        externalId:
+          type: string
+          description: "hex encoded signature"
+    VerifyRequest:
+      required:
+        - plainText
+        - signature
+        - publicKey
+      properties:
+        plainText:
+          type: string
+          description: "Base64 encoded binary data"
+        publicKey:
+          $ref: '#/components/schemas/PublicKey'
+        signature:
+          type: string
+          description: "hex encoded signature"
+    VerifyResponse:
+      required:
+        - outcome
+      properties:
+        outcome:
+          type: boolean
+          description: "true or false"
     LegalEntityURI:
       type: string
       description: "URI defining an organization, usually the custodian or actor"
       example: "https://nuts.nl/identities/agb#00000000"
+    PublicKey:
+      type: string
+      description: "PEM encoded public key"
     SubjectURI:
       type: string
       description: "URI defining the data subject, usually the patient"
