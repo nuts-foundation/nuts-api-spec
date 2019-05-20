@@ -21,7 +21,6 @@ API overview
         window.onload = function() {
             const ui = SwaggerUIBundle({
                 "dom_id": "#swagger-ui",
-                validatorUrl: null,
                 urls: [
                     {url: "../_static/nuts-consent-bridge.yaml", name: "consent-bridge"},
                     {url: "../_static/nuts-fhir-validation.yaml", name: "fhir-validation"},
@@ -30,8 +29,7 @@ API overview
                     ],
                 presets: [
                     SwaggerUIBundle.presets.apis,
-                    SwaggerUIStandalonePreset,
-                    HideTopbarPlugin
+                    SwaggerUIStandalonePreset
                 ],
                 layout: "StandaloneLayout"
             });
