@@ -14,17 +14,6 @@ Back to main documentation: :ref:`nuts-documentation`
     <script src='_static/js/swagger-ui-bundle-3.18.3.js' type='text/javascript'></script>
     <script src='_static/js/swagger-ui-standalone-preset-3.18.3.js' type='text/javascript'></script>
     <script>
-        version = "{{ version }}";
-
-        function HideTopbarPlugin() {
-          // this plugin overrides the Topbar component to return nothing
-          return {
-            components: {
-              Topbar: function() { return null }
-            }
-          }
-        }
-
         window.onload = function() {
             const ui = SwaggerUIBundle({
                 "dom_id": "#swagger-ui",
@@ -33,7 +22,7 @@ Back to main documentation: :ref:`nuts-documentation`
                     {url: "_static/nuts-fhir-validation.yaml", name: "fhir-validation"},
                     {url: "_static/nuts-registry.yaml", name: "nuts-registry"},
                     {url: "_static/nuts-service-crypto.yaml", name: "crypto"},
-                    {url: "https://nuts-documentation.readthedocs.io/projects/nuts-service-proxy/en/" + version + "/_static/openapi-spec.yaml", name: "auth"}
+                    {url: "https://nuts-documentation.readthedocs.io/projects/nuts-service-proxy/en/" + READTHEDOCS_DATA.version + "/_static/openapi-spec.yaml", name: "auth"}
                     ],
                 presets: [
                     SwaggerUIBundle.presets.apis,
