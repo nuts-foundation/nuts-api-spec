@@ -30,7 +30,8 @@ Back to main documentation: :ref:`nuts-documentation`
                     {url: "_static/nuts-consent-bridge.yaml", name: "consent-bridge"},
                     {url: "_static/nuts-fhir-validation.yaml", name: "fhir-validation"},
                     {url: "_static/nuts-registry.yaml", name: "nuts-registry"},
-                    {url: "_static/nuts-service-crypto.yaml", name: "crypto"}
+                    {url: "_static/nuts-service-crypto.yaml", name: "crypto"},
+                    {url: "https://nuts-service-proxy.readthedocs.io/en/latest/_static/openapi-spec.yaml", name: "auth"}
                     ],
                 presets: [
                     SwaggerUIBundle.presets.apis,
