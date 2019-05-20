@@ -6,5 +6,5 @@ API overview
 
     <script src='../_static/js/swagger-client-2.6.6.js' type='text/javascript'></script>
     <script>
-        var swaggerClient = new SwaggerClient(../_static/nuts-consent-bridge.yaml);
+        var swaggerClient = new SwaggerClient("../_static/nuts-consent-bridge.yaml");
     </script>
