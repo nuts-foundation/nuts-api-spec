@@ -21,7 +21,7 @@ API overview
         window.onload = function() {
             const ui = SwaggerUIBundle({
                 "dom_id": "#swagger-ui",
-                url: "../_static/nuts-consent-bridge.yaml",
+                url: "../_static/index.yaml",
                 presets: [
                     SwaggerUIBundle.presets.apis,
                     SwaggerUIStandalonePreset,
