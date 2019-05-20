@@ -21,8 +21,12 @@ API overview
         window.onload = function() {
             const ui = SwaggerUIBundle({
                 "dom_id": "#swagger-ui",
+                validatorUrl: null,
                 urls: [
-                    {url: "../_static/nuts-consent-bridge.yaml", name: "consent-bridge"}
+                    {url: "../_static/nuts-consent-bridge.yaml", name: "consent-bridge"},
+                    {url: "../_static/nuts-fhir-validation.yaml", name: "fhir-validation"},
+                    {url: "../_static/nuts-registry.yaml", name: "nuts-registry"},
+                    {url: "../_static/nuts-service-crypto.yaml", name: "crypto"}
                     ],
                 presets: [
                     SwaggerUIBundle.presets.apis,
