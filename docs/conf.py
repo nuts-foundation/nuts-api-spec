@@ -36,6 +36,10 @@ on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 # This is used for linking and such so we link to the thing we're building
 rtd_version = os.environ.get("READTHEDOCS_VERSION", "latest")
 
+html_context = {
+    'version': rtd_version,
+}
+
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
