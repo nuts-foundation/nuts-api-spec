@@ -31,7 +31,7 @@ paths:
                 type: string
   /crypto/encrypt:
     post:
-      summary: "encrypt a piece of data for the given legalEntity or public key"
+      summary: "encrypt a piece of data for a list of public keys/legalEntityURI's. A single symmetric keys will be used for all entries"
       operationId: encrypt
       tags:
         - crypto
@@ -157,34 +157,54 @@ paths:
 components:
   schemas:
     EncryptRequest:
-      description: "EncryptRequest either has a publicKey or legalEntityURI, not both"
+      description: "EncryptRequest has a list of publicKeys and legalEntityURI's. The legalEntityURI's are there only for easy bookkeeping. The data will only be encrypted once with a symmetric key. The symmetric key will be encrypted for all given publicKeys"
+      required:
+        - plainText
+        - encryptRequestSubjects
+      properties:
+        plainText:
+          type: string
+          description: "Base64 encoded binary data"
+        encryptRequestSubjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/EncryptRequestSubject"
+    EncryptRequestSubject:
+      description: "A legalEntityURI and its public key. Only the public key is used. The resulting object will match the encrypted key to the given legalEntityURI"
       required:
         - legalEntityURI
-        - plainText
         - publicKey
       properties:
         legalEntityURI:
           $ref: "#/components/schemas/LegalEntityURI"
-        plainText:
-          type: string
-          description: "Base64 encoded binary data"
         publicKey:
-          $ref: '#/components/schemas/PublicKey'
+          $ref: "#/components/schemas/PublicKey"
     EncryptResponse:
       required:
         - cipherText
-        - cipherTextKey
         - nonce
+        - encryptResponseEntries
       properties:
         cipherText:
           type: string
           description: "Base64 encoded encrypted text"
-        cipherTextKey:
-          type: string
-          description: "Base64 encoded encrypted key"
         nonce:
           type: string
           description: "Base64 encoded nonce"
+        encryptResponseEntries:
+          type: array
+          items:
+            $ref: "#/components/schemas/EncryptResponseEntry"
+    EncryptResponseEntry:
+      required:
+        - legalEntityURI
+        - cipherTextKey
+      properties:
+        cipherTextKey:
+          type: string
+          description: "Base64 encoded encrypted key"
+        legalEntityURI:
+          $ref: "#/components/schemas/LegalEntityURI"
     DecryptRequest:
       required:
         - legalEntityURI
