@@ -86,15 +86,9 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
-              type: object
-              properties:
-                consentRequestMetadata:
-                  $ref: '#/components/schemas/ConsentRequestMetadata'
-                attachment:
-                  type: string
-                  format: binary
+              $ref: '#/components/schemas/NewConsentRequestState'
       responses:
         '200':
           description: Dummy response
@@ -218,19 +212,23 @@ components:
       properties:
         publicKey:
           type: string
-          description: pem encoded public key
+          description: "pem encoded RSA public key"
         data:
           type: string
-          description: base64 encoded bytes
-    ConsentRequestMetadata:
+          description: "base64 encoded bytes"
+    NewConsentRequestState:
       required:
         - externalId
         - metadata
+        - attachment
       properties:
         externalId:
           type: string
         metadata:
           $ref: '#/components/schemas/Metadata'
+        attachment:
+          type: string
+          description: "Base64 encoded data"
     Metadata:
       required:
         - domain
@@ -273,7 +271,7 @@ components:
           type: string
         cipherText:
           type: string
-          description: base64 encoded
+          description: "base64 encoded"
     Period:
       required:
         - validFrom
