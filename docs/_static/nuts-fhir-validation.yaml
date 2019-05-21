@@ -73,7 +73,7 @@ components:
           items:
             $ref: "#/components/schemas/ActorURI"
         custodian:
-          $ref: "#/components/schemas/CustodianyURI"
+          $ref: "#/components/schemas/CustodianURI"
         resources:
           description: "Array of fhir resources"
           type: array
@@ -85,7 +85,7 @@ components:
       type: string
       description: "URI defining the actor, usually a practitioner"
       example: "https://nuts.nl/identities/agb#00000007"
-    CustodianyURI:
+    CustodianURI:
       type: string
       description: "URI defining an organization, usually the custodian or actor"
       example: "https://nuts.nl/identities/agb#00000000"
