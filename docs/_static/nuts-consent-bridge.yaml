@@ -35,51 +35,51 @@ paths:
   /api/consent_request_state/{uuid}:
     get:
       operationId: getConsentRequestStateById
-      summary: Get a consent request state by its UUID
+      summary: "Get a consent request state by its UUID"
       tags:
         - consent
       parameters:
         - name: uuid
           in: path
-          description: The UUID as in created ConsentRequestState and event.
+          description: "The UUID as in created ConsentRequestState and event."
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: A ConsentRequestState object representing the Corda state
+          description: "A ConsentRequestState object representing the Corda state"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConsentRequestState'
         '404':
-          description: The given ID can not be found
+          description: "The given ID can not be found"
   /api/attachment/{secureHash}:
     get:
       operationId: getAttachmentBySecureHash
-      summary: download an attachment identified by its hash
+      summary: "download an attachment identified by its hash"
       tags:
         - consent
       parameters:
         - name: secureHash
           in: path
-          description: The secure hash of the attachment bytes.
+          description: "The secure hash of the attachment bytes."
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: A bytes stream representing the zip file
+          description: "A byte stream representing the zip file"
           content:
             application/octet-stream:
               schema:
                 type: string
                 format: byte
         '404':
-          description: The given hash can not be found
+          description: "The given hash can not be found"
   /api/consent/consent_request:
     post:
-      summary: Create a new consent request state.
+      summary: "Create a new consent request state."
       operationId: newConsentRequestState
       tags:
         - consent
@@ -91,28 +91,28 @@ paths:
               $ref: '#/components/schemas/NewConsentRequestState'
       responses:
         '200':
-          description: Dummy response
+          description: "The response holds the given consentID and a stateMachineId. The stateMachineId can be used to query the status of the request before it is committed to the vault"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: "#/components/schemas/ConsentRequestJobState"
         '400':
-          description: incorrect data
+          description: "incorrect data"
           content:
             text/plain:
               example:
                 invalid metadata
   /api/consent/consent_request/{uuid}/accept:
     post:
-      summary: Accept a consent request state. This means a Care provider lets the Nuts node know
-        that the patient mentioned in the attachment is also a patient for that care provider.
+      summary: "Accept a consent request state. This means a Care provider lets the Nuts node know
+        that the patient mentioned in the attachment is also a patient for that care provider."
       operationId: acceptConsentRequestState
       tags:
         - consent
       parameters:
         - name: uuid
           in: path
-          description: The Unique ID of the consent request record
+          description: "The Unique ID of the consent request record"
           required: true
           schema:
             type: string
@@ -124,44 +124,44 @@ paths:
               $ref: "#/components/schemas/PartyAttachmentSignature"
       responses:
         '200':
-          description: Dummy response
+          description: "The response holds the given consentID and a stateMachineId. The stateMachineId can be used to query the status of the request before it is committed to the vault"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: "#/components/schemas/ConsentRequestJobState"
         '400':
           description: incorrect data
           content:
             text/plain:
               example:
-                externalID not found
+                "externalID not found"
   /api/consent/consent_request/{uuid}/finalize:
     post:
-      summary: Finalize a consent request state. This means a Care provider lets the Nuts node know
-        that all checks have been done and that this request can be promoted to a consent record.
+      summary: "Finalize a consent request state. This means a Care provider lets the Nuts node know
+        that all checks have been done and that this request can be promoted to a consent record."
       operationId: finalizeConsentRequestState
       tags:
         - consent
       parameters:
         - name: uuid
           in: path
-          description: The Unique ID of the consent request record
+          description: "The Unique ID of the consent request record"
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: Dummy response
+          description: "The response holds the given consentID and a stateMachineId. The stateMachineId can be used to query the status of the request before it is committed to the vault"
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: "#/components/schemas/ConsentRequestJobState"
         '400':
           description: incorrect data
           content:
             text/plain:
               example:
-                externalID not found
+                "externalID not found"
 components:
   schemas:
     EventStreamSetting:
@@ -191,6 +191,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PartyAttachmentSignature'
+    ConsentRequestJobState:
+      required:
+        - consentId
+        - stateMachineId
+      properties:
+        consentId:
+          $ref: '#/components/schemas/ConsentId'
+        stateMachineId:
+          $ref: '#/components/schemas/StateMachineId'
     PartyAttachmentSignature:
       required:
         - legalEntityURI
@@ -283,12 +292,16 @@ components:
           type: string
           format: date
     ConsentId:
-      required:
-        - externalId
-        - UUID
       properties:
         externalId:
           type: string
+          description: "Unique hexadecimal identifier created based on BSN and private key of care provider."
+          example: "abc2345d6a5B6445cd"
         UUID:
           type: string
-          description: Unique identifier assigned by the consent cordapp
+          description: "Unique identifier assigned by the consent cordapp"
+          example: "cb94aaa4-fa68-4633-aee8-3eef143b3535"
+    StateMachineId:
+      type: string
+      description: "Corda StateMachineID, can be used to diagnose stuck Corda flows"
+      example: "cb94aaa4-fa68-4633-aee8-3eef143b3535"
