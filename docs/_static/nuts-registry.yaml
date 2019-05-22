@@ -6,6 +6,44 @@ info:
   license:
     name: GPLv3
 paths:
+  /api/organization/{id}/actors:
+    get:
+      summary: "get actors for given organization, the main question that is answered by this api: may the professional represent the organization?"
+      operationId: organizationActors
+      tags:
+        - organizations
+      parameters:
+        - name: id
+          in: path
+          description: "URI identifier"
+          required: true
+          example: "https://nuts.nl/identities/agb#00000007"
+          schema:
+            type: string
+        - name: actorId
+          in: query
+          description: "Actor URI style identifier"
+          required: true
+          example: "https://nuts.nl/identities/agb#00000007"
+          schema:
+            type:
+              string
+      responses:
+        '200':
+          description: "Matching records for given identifiers, if no current employment or mandate is present an empty list is returned"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Identifier"
+        '400':
+          description: "Invalid request, when required query params are missing"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Missing parameter actorId"
   /api/organization/{id}:
     get:
       summary: Get organization bij id
@@ -15,9 +53,9 @@ paths:
       parameters:
         - name: id
           in: path
-          description: URI identifier
+          description: "URI identifier"
           required: true
-          example: https://nuts.nl/identities/agb#00000007
+          example: "https://nuts.nl/identities/agb#00000007"
           schema:
             type: string
       responses:
@@ -102,8 +140,15 @@ paths:
                 type: string
 components:
   schemas:
+    Actor:
+      description: "A person that acts on behalf of an organization"
+      required:
+        - identifier
+      properties:
+        identifier:
+          $ref: "#/components/schemas/Identifier"
     EndpointOrganization:
-      description: Mapping between Endpoints and Organizations
+      description: "Mapping between Endpoints and Organizations"
       required:
         - endpointIdentifier
         - organizationIdentifier
@@ -128,6 +173,10 @@ components:
           example: Zorggroep Nuts
         identifier:
           $ref: '#/components/schemas/Identifier'
+        actors:
+          type: array
+          items:
+            $ref: "#/components/schemas/Actor"
     Endpoint:
       required:
         - endpointType
