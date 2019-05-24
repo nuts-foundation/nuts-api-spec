@@ -47,7 +47,6 @@ paths:
           content:
             application/json:
               schema:
-                type: object
                 $ref: '#/components/schemas/JobCreatedResponse'
   '/api/consent/validation':
     post:
@@ -96,75 +95,83 @@ components:
           example: '87203b8f5b23f04c20b645b1121c6ed561b2d45c1d903083332b8b98ce0f7f10bc6bd7b2094bf8287a72246c3c1c318811e022b183eac9d1e1a4fcadeeb2c9e9'
     CreateConsentRequest:
       type: object
+      required:
+        - subject
+        - custodian
+        - actors
       properties:
-        involvedParties:
-          type: object
-          required:
-            - patient
-            - custodian
-            - others
-          properties:
-            subject:
-              type: string
-              example: "https://nuts.nl/identities/bsn#999999990"
-              description: >
-                The id that refers to the patient.
-            custodian:
-              description: >
-                The organizationId of the the custodian of the data.
-              type: string
-              example: "https://nuts.nl/identities/agb#00000000"
-            actors:
-              description: >
-                A list of organizationIds which may access the patients
-                data. These organizations will take part in the consent
-                synchronization transactions.
-              type: array
-              items:
-                type: string
-              example:
-                - "https://nuts.nl/identities/agb#00000001"
-                - "https://nuts.nl/identities/agb#00000002"
+        subject:
+          $ref: "#/components/schemas/SubjectURI"
+        custodian:
+          $ref: "#/components/schemas/CustodianURI"
+        actors:
+          description: >
+            A list of organizationIds which may access the patients
+            data. These organizations will take part in the consent
+            synchronization transactions.
+          type: array
+          items:
+            $ref: "#/components/schemas/ActorURI"
+          example:
+            - "https://nuts.nl/identities/agb#00000001"
+            - "https://nuts.nl/identities/agb#00000002"
 
-        meta:
-          type: object
-          properties:
-            performerIdentity:
-              description: >
-                A cryptographic identiy of the performer, the
-                person who administers the consent. This field is
-                optional. If no performer can be identified the
-                consentProof field is mandatory.
-              type: object
-              properties:
-                contract:
-                  type: string
-                  description: Base64 encoded contract which contains the identity of the performer.
-                  example: dmFsaWQgaXJtYSBjb250cmFjdA==
-                contentType:
-                  type: string
-                  description: The contentType of the contract
-                  example: 'application/json+irma'
-            consentProof:
-              type: object
-              description: The proof of the consent. E.g. a scan of a signed document, signed pdf or irma proof.
-              properties:
-                contentType:
-                  type: string
-                  example: 'application/pdf'
-                  description: The mime-type of the proof
-                data:
-                  type: string
-                  example: cGRmIGRvY3VtZW50IHdpdGggc2lnbmF0dXJl
-                  description: base64 encoded proof
-            period:
-              type: object
-              properties:
-                start:
-                  type: string
-                  format: date-time
-                  example: "2019-05-20T17:02:33+10:00"
-                end:
-                  type: string
-                  format: date-time
-                  example: "2019-11-20T17:02:33+10:00"
+        performer:
+          description: >
+            A cryptographic identiy of the performer, the
+            person who administers the consent. This field
+            is optional. If no performer can be identified
+            the consentProof field is mandatory.
+          $ref: "#/components/schemas/IdentifierURI"
+        consentProof:
+          description: The proof of the consent. E.g. a scan of a signed document, signed pdf or irma proof.
+          example:
+            contentType: 'application/pdf'
+            data: cGRmIGRvY3VtZW50IHdpdGggc2lnbmF0dXJl
+          allOf:
+            - $ref: "#/components/schemas/EmbeddedData"
+        period:
+          $ref: "#/components/schemas/Period"
+    Period:
+      type: object
+      required:
+        - start
+        - end
+      properties:
+        start:
+          type: string
+          format: date-time
+          example: "2019-05-20T17:02:33+10:00"
+        end:
+          type: string
+          format: date-time
+          example: "2019-11-20T17:02:33+10:00"
+    EmbeddedData:
+      type: object
+      required:
+        - data
+        - contentType
+      properties:
+        data:
+          type: string
+          description: Base64 encoded data with a content type
+          example: "UGxhaW4gdGV4dCBtZXNzYWdl"
+        contentType:
+          type: string
+          example: 'text/plain'
+    IdentifierURI:
+      type: string
+      description: "URI defining a party such as a person or organization"
+      example: "https://nuts.nl/identities/agb#00000007"
+    ActorURI:
+      type: string
+      description: "URI defining the actor, usually a practitioner"
+      example: "https://nuts.nl/identities/agb#00000007"
+    CustodianURI:
+      type: string
+      description: "URI defining an organization, usually the custodian or actor"
+      example: "https://nuts.nl/identities/agb#00000000"
+    SubjectURI:
+      type: string
+      description: "URI defining the data subject, usually the patient"
+      example: "https://nuts.nl/identities/bsn#999999990"
