@@ -1,14 +1,17 @@
 openapi: "3.0.0"
 info:
-  title: Nuts service proxy consent spec
-  description: API specification for consent service available at nuts service proxy
+  title: Nuts consent store spec
+  description: >
+    API specification for consent services available at nuts consent store.
+    The Nuts consent store has a database of decrypted Subject, Custodian, Actor, Resource combinations.
+    This allows for vendor specific logic to query and check for specific consent.
   version: 0.1.0
   license:
     name: GPLv3
 paths:
   /consent/check:
     post:
-      summary: "Send a request for checking if the given combination has valid consent"
+      summary: "Send a request for checking if the given combination exists"
       operationId: checkConsent
       tags:
         - consent
@@ -60,7 +63,7 @@ paths:
                 type: string
   /consent:
     post:
-      summary: "Create a new consent request"
+      summary: "Create a new consent record"
       operationId: createConsent
       tags:
         - consent
@@ -69,14 +72,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ConsentRequest"
+              $ref: "#/components/schemas/SimplifiedConsent"
       responses:
-        '202':
-          description: "OK response, body holds reference to request"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConsentRequestState"
+        '201':
+          description: "Created response"
         '400':
           description: "Invalid request"
           content:
@@ -84,29 +83,6 @@ paths:
               example: "missing value for actorURI"
               schema:
                 type: string
-  /consent/consent_request_state/{externalID}:
-    get:
-      summary: "get the ConsentRequestState by the externalID"
-      description: "This api can be used to track a request while it's in flight and not yet converted to a consent record."
-      operationId: getConsentRequestState
-      tags:
-        - consent
-      parameters:
-        - name: externalID
-          in: path
-          description: "the externalID of the consent record"
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: "OK response"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConsentRequestState"
-        '404':
-          description: "not found"
 components:
   schemas:
     ConsentCheckRequest:
@@ -124,6 +100,7 @@ components:
           $ref: "#/components/schemas/ActorURI"
         resourceType:
           type: string
+          description: "FHIR resource that is requested"
           example: "Observation"
     ConsentCheckResponse:
       required:
@@ -161,56 +138,31 @@ components:
         results:
           type: array
           items:
-            $ref: "#/components/schemas/ConsentQueryResult"
+            $ref: "#/components/schemas/SimplifiedConsent"
         totalResults:
           type: integer
           description: Total number of results
-    ConsentQueryResult:
+    SimplifiedConsent:
+      description: "Simplified consent record"
       required:
-        - custodianURI
-        - subjectURI
-        - resourceTypes
+        - actors
+        - custodian
+        - resources
+        - subject
       properties:
-        custodianURI:
+        actors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActorURI"
+        custodian:
           $ref: "#/components/schemas/CustodianURI"
-        subjectURI:
-          $ref: "#/components/schemas/SubjectURI"
-        resourceType:
+        resources:
+          description: "Array of fhir resources"
           type: array
           items:
             type: string
-            example: "Observation"
-    ConsentRequest:
-      required:
-        - subjectURI
-        - custodianURI
-        - actorURI
-        - categoryURI
-      properties:
-        subjectURI:
+        subject:
           $ref: "#/components/schemas/SubjectURI"
-        custodianURI:
-          $ref: "#/components/schemas/CustodianURI"
-        actorURI:
-          $ref: "#/components/schemas/ActorURI"
-        categoryURI:
-          type: string
-          description: "URI describing the general category of consent: social, medical, mental, etc. Categories map to resources"
-          example: "https://nuts.nl/CodeSystems/ConsentCategory#medical"
-        period:
-          $ref: "#/components/schemas/Period"
-    ConsentRequestState:
-      required:
-        - externalID
-        - state
-      properties:
-        externalID:
-          type: string
-          description: "The unique ID used within the consent DB for this patient/custodian tuple"
-        state:
-          type: string
-          enum: ["new", "update", "stable"]
-          description: "new for a new request, update for an existing consent record that is being updated, stable for an available consent record"
     PageDefinition:
       required:
         - offset
@@ -228,18 +180,6 @@ components:
       type: string
       description: "URI defining the legal entity responsible for the data"
       example: "https://nuts.nl/identities/agbcode#00000000"
-    Period:
-      required:
-        - from
-      properties:
-        from:
-          type: string
-          format: date
-          description: "inclusive date, starting day of consent"
-        to:
-          type: string
-          format: date
-          description: "exclusive date, end day of consent"
     SubjectQuery:
       type: string
       description: "Free text search for finding subjects"
