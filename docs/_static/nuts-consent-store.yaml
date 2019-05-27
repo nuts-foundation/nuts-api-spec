@@ -32,7 +32,7 @@ paths:
           description: "Invalid request"
           content:
             text/plain:
-              example: "missing value for subjectURI"
+              example: "missing value for subject"
               schema:
                 type: string
   /consent/query:
@@ -58,7 +58,7 @@ paths:
           description: "Invalid request"
           content:
             text/plain:
-              example: "missing value for actorURI"
+              example: "missing value for actor"
               schema:
                 type: string
   /consent:
@@ -80,24 +80,24 @@ paths:
           description: "Invalid request"
           content:
             text/plain:
-              example: "missing value for actorURI"
+              example: "missing value for actor"
               schema:
                 type: string
 components:
   schemas:
     ConsentCheckRequest:
       required:
-        - subjectURI
-        - custodianURI
-        - actorURI
+        - subject
+        - custodian
+        - actor
         - resourceType
       properties:
-        subjectURI:
-          $ref: "#/components/schemas/SubjectURI"
-        custodianURI:
-          $ref: "#/components/schemas/CustodianURI"
-        actorURI:
-          $ref: "#/components/schemas/ActorURI"
+        subject:
+          $ref: "#/components/schemas/Identifier"
+        custodian:
+          $ref: "#/components/schemas/Identifier"
+        actor:
+          $ref: "#/components/schemas/Identifier"
         resourceType:
           type: string
           description: "FHIR resource that is requested"
@@ -116,17 +116,17 @@ components:
             "Only measurements are allowed, SOEP not"
     ConsentQueryRequest:
       required:
-        - actorURI
+        - actor
         - query
       properties:
-        actorURI:
-          $ref: "#/components/schemas/ActorURI"
+        actor:
+          $ref: "#/components/schemas/Identifier"
         page:
           $ref: "#/components/schemas/PageDefinition"
         query:
           oneOf:
             - $ref: "#/components/schemas/SubjectQuery"
-            - $ref: "#/components/schemas/SubjectURI"
+            - $ref: "#/components/schemas/Identifier"
     ConsentQueryResponse:
       required:
         - page
@@ -153,16 +153,16 @@ components:
         actors:
           type: array
           items:
-            $ref: "#/components/schemas/ActorURI"
+            $ref: "#/components/schemas/Identifier"
         custodian:
-          $ref: "#/components/schemas/CustodianURI"
+          $ref: "#/components/schemas/Identifier"
         resources:
           description: "Array of fhir resources"
           type: array
           items:
             type: string
         subject:
-          $ref: "#/components/schemas/SubjectURI"
+          $ref: "#/components/schemas/Identifier"
     PageDefinition:
       required:
         - offset
@@ -172,21 +172,17 @@ components:
           type: integer
         limit:
           type: integer
-    ActorURI:
-      type: string
-      description: "URI defining the user"
-      example: "https://nuts.nl/identities/agbcode#00000007"
-    CustodianURI:
-      type: string
-      description: "URI defining the legal entity responsible for the data"
-      example: "https://nuts.nl/identities/agbcode#00000000"
     SubjectQuery:
       type: string
       description: "Free text search for finding subjects"
       example: "Mr Janse*"
-    SubjectURI:
+    Identifier:
       type: string
-      description: "URI defining the data subject, usually the patient"
-      example: "https://nuts.nl/identities/bsn#999999990"
-
-
+      description: >
+        Generic identifier used for representing BSN, agbcode, etc.
+        It's always constructed as an URN followed by a double colon (::) and then the identifying value of the given URN
+      example: |
+        * urn:nuts:bsn::999999990
+        * urn:nuts:agbcode::00000007
+        * urn:nuts:endpoint::consent
+        * urn:ietf:rfc:1779::O=Nedap, OU=Healthcare, C=NL, ST=Gelderland, L=Groenlo, CN=nuts_corda_development_local
