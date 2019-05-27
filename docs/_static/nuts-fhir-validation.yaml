@@ -71,25 +71,23 @@ components:
         actors:
           type: array
           items:
-            $ref: "#/components/schemas/ActorURI"
+            $ref: "#/components/schemas/Identifier"
         custodian:
-          $ref: "#/components/schemas/CustodianURI"
+          $ref: "#/components/schemas/Identifier"
         resources:
           description: "Array of fhir resources"
           type: array
           items:
             type: string
         subject:
-          $ref: "#/components/schemas/SubjectURI"
-    ActorURI:
+          $ref: "#/components/schemas/Identifier"
+    Identifier:
       type: string
-      description: "URI defining the actor, usually a practitioner"
-      example: "https://nuts.nl/identities/agb#00000007"
-    CustodianURI:
-      type: string
-      description: "URI defining an organization, usually the custodian or actor"
-      example: "https://nuts.nl/identities/agb#00000000"
-    SubjectURI:
-      type: string
-      description: "URI defining the data subject, usually the patient"
-      example: "https://nuts.nl/identities/bsn#999999990"
+      description: >
+        Generic identifier used for representing BSN, agbcode, etc.
+        It's always constructed as an URN followed by a double colon (::) and then the identifying value of the given URN
+      example: |
+        * urn:nuts:bsn::999999990
+        * urn:nuts:agbcode::00000007
+        * urn:nuts:endpoint::consent
+        * urn:ietf:rfc:1779::O=Nedap, OU=Healthcare, C=NL, ST=Gelderland, L=Groenlo, CN=nuts_corda_development_local
