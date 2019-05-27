@@ -202,13 +202,12 @@ components:
           $ref: '#/components/schemas/StateMachineId'
     PartyAttachmentSignature:
       required:
-        - legalEntityURI
+        - legalEntity
         - attachment
         - signature
       properties:
-        legalEntityURI:
-          type: string
-          example: https://nuts.nl/identities/agbcode#00000007
+        legalEntity:
+          $ref: "#/components/schemas/Identifier"
         attachment:
           type: string
           description: Hexidecimal SecureHash value
@@ -271,11 +270,10 @@ components:
           type: string
     ASymmetricKey:
       required:
-        - legalEntityURI
+        - legalEntity
       properties:
-        legalEntityURI:
-          type: string
-          example: "https://nuts.nl/identities/agbcode#00000000"
+        legalEntity:
+          $ref: "#/components/schemas/Identifier"
         alg:
           type: string
         cipherText:
@@ -305,3 +303,13 @@ components:
       type: string
       description: "Corda StateMachineID, can be used to diagnose stuck Corda flows"
       example: "cb94aaa4-fa68-4633-aee8-3eef143b3535"
+    Identifier:
+      type: string
+      description: >
+        Generic identifier used for representing BSN, agbcode, etc.
+        It's always constructed as an URN followed by a double colon (::) and then the identifying value of the given URN
+      example: |
+        * urn:nuts:bsn::999999990
+        * urn:nuts:agbcode::00000007
+        * urn:nuts:endpoint::consent
+        * urn:ietf:rfc:1779::O=Nedap, OU=Healthcare, C=NL, ST=Gelderland, L=Groenlo, CN=nuts_corda_development_local
