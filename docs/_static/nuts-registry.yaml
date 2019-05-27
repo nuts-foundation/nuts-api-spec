@@ -15,16 +15,16 @@ paths:
       parameters:
         - name: id
           in: path
-          description: "URI identifier"
+          description: "URL encoded Identifier"
           required: true
-          example: "https://nuts.nl/identities/agb#00000007"
+          example: "urn:nuts:agbcode::00000007"
           schema:
             type: string
         - name: actorId
           in: query
-          description: "Actor URI style identifier"
+          description: "URL encoded Actor identifier"
           required: true
-          example: "https://nuts.nl/identities/agb#00000007"
+          example: "urn:nuts:agbcode::00000007"
           schema:
             type:
               string
@@ -53,9 +53,9 @@ paths:
       parameters:
         - name: id
           in: path
-          description: "URI identifier"
+          description: "URL encoded identifier"
           required: true
-          example: "https://nuts.nl/identities/agb#00000007"
+          example: "urn:nuts:agbcode::00000007"
           schema:
             type: string
       responses:
@@ -109,13 +109,13 @@ paths:
       parameters:
         - name: orgIds
           in: query
-          description: A list of organisation identifiers to query for. identifiers are URI's with proper escaping
+          description: A list of organisation identifiers to query for. identifiers are Nuts Identifiers with proper escaping
           required: true
           schema:
             type: array
             items:
               type: string
-              description: URI type identifiers
+              description: URL encoded Identifiers
         - name: type
           in: query
           description: The type of endpoint requested, eg Nuts or FHIR
@@ -150,14 +150,14 @@ components:
     EndpointOrganization:
       description: "Mapping between Endpoints and Organizations"
       required:
-        - endpointIdentifier
-        - organizationIdentifier
+        - endpoint
+        - organization
         - status
       properties:
-        endpointIdentifier:
-          $ref: '#/components/schemas/Identifier'
-        organizationIdentifier:
-          $ref: '#/components/schemas/Identifier'
+        endpoint:
+          $ref: "#/components/schemas/Identifier"
+        organization:
+          $ref: "#/components/schemas/Identifier"
         status:
           type: string
           enum: ["active", "disabled"]
@@ -172,7 +172,7 @@ components:
           description: the well-known name for the organization
           example: Zorggroep Nuts
         identifier:
-          $ref: '#/components/schemas/Identifier'
+          $ref: "#/components/schemas/Identifier"
         actors:
           type: array
           items:
@@ -191,9 +191,9 @@ components:
         endpointType:
           type: string
           description: URI of the type of endpoint
-          example: https://nuts.nl/CodeSystem/endpoint-type#consent
+          example: "urn:nuts:endpoint::consent"
         identifier:
-          $ref: '#/components/schemas/Identifier'
+          $ref: "#/components/schemas/Identifier"
         status:
           type: string
           enum: ["active", "disabled"]
@@ -206,15 +206,12 @@ components:
           description: location of the actual en endpoint on the internet
           example: tcp://127.0.0.1:1234, https://nuts.nl/endpoint
     Identifier:
-      required:
-        - system
-        - value
-      properties:
-        system:
-          type: string
-          description: the code system used for this identifier
-          example: urn:ietf:rfc:1779
-        value:
-          type: string
-          description: the value, valid within the code system
-          example: O=Nedap, OU=Healthcare, C=NL, ST=Gelderland, L=Groenlo, CN=nuts_corda_development_nvc3810
+      type: string
+      description: >
+        Generic identifier used for representing BSN, agbcode, etc.
+        It's always constructed as an URN followed by a double colon (::) and then the identifying value of the given URN
+      example: |
+        * urn:nuts:bsn::999999990
+        * urn:nuts:agbcode::00000007
+        * urn:nuts:endpoint::consent
+        * urn:ietf:rfc:1779::O=Nedap, OU=Healthcare, C=NL, ST=Gelderland, L=Groenlo, CN=nuts_corda_development_local
