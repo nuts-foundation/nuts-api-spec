@@ -13,12 +13,12 @@ paths:
       tags:
         - crypto
       parameters:
-        - name:  legalEntityURI
+        - name:  legalEntity
           in: query
-          description: "URI identifying the legal entity"
+          description: "URN identifying the legal entity"
           required: true
           schema:
-            $ref: "#/components/schemas/LegalEntityURI"
+            $ref: "#/components/schemas/Identifier"
       responses:
         '201':
           description: "Key has been created successfully"
@@ -26,12 +26,12 @@ paths:
           description: "Invalid request"
           content:
             text/plain:
-              example: "Invalid URI"
+              example: "Invalid legalEntity URN"
               schema:
                 type: string
   /crypto/encrypt:
     post:
-      summary: "encrypt a piece of data for a list of public keys/legalEntityURI's. A single symmetric keys will be used for all entries"
+      summary: "encrypt a piece of data for a list of public keys/legalEntity's. A single symmetric keys will be used for all entries"
       operationId: encrypt
       tags:
         - crypto
@@ -157,7 +157,7 @@ paths:
 components:
   schemas:
     EncryptRequest:
-      description: "EncryptRequest has a list of publicKeys and legalEntityURI's. The legalEntityURI's are there only for easy bookkeeping. The data will only be encrypted once with a symmetric key. The symmetric key will be encrypted for all given publicKeys"
+      description: "EncryptRequest has a list of publicKeys and legalEntity's. The legalEntity's are there only for easy bookkeeping. The data will only be encrypted once with a symmetric key. The symmetric key will be encrypted for all given publicKeys"
       required:
         - plainText
         - encryptRequestSubjects
@@ -170,13 +170,13 @@ components:
           items:
             $ref: "#/components/schemas/EncryptRequestSubject"
     EncryptRequestSubject:
-      description: "A legalEntityURI and its public key. Only the public key is used. The resulting object will match the encrypted key to the given legalEntityURI"
+      description: "A legalEntity and its public key. Only the public key is used. The resulting object will match the encrypted key to the given legalEntity"
       required:
-        - legalEntityURI
+        - legalEntity
         - publicKey
       properties:
-        legalEntityURI:
-          $ref: "#/components/schemas/LegalEntityURI"
+        legalEntity:
+          $ref: "#/components/schemas/Identifier"
         publicKey:
           $ref: "#/components/schemas/PublicKey"
     EncryptResponse:
@@ -197,23 +197,23 @@ components:
             $ref: "#/components/schemas/EncryptResponseEntry"
     EncryptResponseEntry:
       required:
-        - legalEntityURI
+        - legalEntity
         - cipherTextKey
       properties:
         cipherTextKey:
           type: string
           description: "Base64 encoded encrypted key"
-        legalEntityURI:
-          $ref: "#/components/schemas/LegalEntityURI"
+        legalEntity:
+          $ref: "#/components/schemas/Identifier"
     DecryptRequest:
       required:
-        - legalEntityURI
+        - legalEntity
         - cipherText
         - cipherTextKey
         - nonce
       properties:
-        legalEntityURI:
-          $ref: "#/components/schemas/LegalEntityURI"
+        legalEntity:
+          $ref: "#/components/schemas/Identifier"
         cipherText:
           type: string
           description: "Base64 encoded cipherText"
@@ -232,13 +232,13 @@ components:
           description: "Base64 encoded plain text"
     ExternalIdRequest:
       required:
-        - legalEntityURI
-        - subjectURI
+        - legalEntity
+        - subject
       properties:
-        legalEntityURI:
-          $ref: "#/components/schemas/LegalEntityURI"
-        subjectURI:
-          $ref: "#/components/schemas/SubjectURI"
+        legalEntity:
+          $ref: "#/components/schemas/Identifier"
+        subject:
+          $ref: "#/components/schemas/Identifier"
     ExternalIdResponse:
       required:
         - externalId
@@ -249,10 +249,10 @@ components:
     SignRequest:
       required:
         - plainText
-        - legalEntityURI
+        - legalEntity
       properties:
-        legalEntityURI:
-          $ref: "#/components/schemas/LegalEntityURI"
+        legalEntity:
+          $ref: "#/components/schemas/Identifier"
         plainText:
           type: string
           description: "Base64 encoded data"
@@ -284,14 +284,16 @@ components:
         outcome:
           type: boolean
           description: "true or false"
-    LegalEntityURI:
-      type: string
-      description: "URI defining an organization, usually the custodian or actor"
-      example: "https://nuts.nl/identities/agb#00000000"
     PublicKey:
       type: string
       description: "PEM encoded public key"
-    SubjectURI:
+    Identifier:
       type: string
-      description: "URI defining the data subject, usually the patient"
-      example: "https://nuts.nl/identities/bsn#999999990"
+      description: >
+        Generic identifier used for representing BSN, agbcode, etc.
+        It's always constructed as an URN followed by a double colon (::) and then the identifying value of the given URN
+      example: |
+        * urn:nuts:bsn::999999990
+        * urn:nuts:agbcode::00000007
+        * urn:nuts:endpoint::consent
+        * urn:ietf:rfc:1779::O=Nedap, OU=Healthcare, C=NL, ST=Gelderland, L=Groenlo, CN=nuts_corda_development_local
