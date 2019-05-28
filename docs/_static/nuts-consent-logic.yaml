@@ -113,8 +113,8 @@ components:
           items:
             $ref: "#/components/schemas/ActorURI"
           example:
-            - "https://nuts.nl/identities/agb#00000001"
-            - "https://nuts.nl/identities/agb#00000002"
+            - "urn:oid:2.16.840.1.113883.2.4.6.1:00000001"
+            - "urn:oid:2.16.840.1.113883.2.4.6.1:00000002"
 
         performer:
           description: >
@@ -162,16 +162,16 @@ components:
     IdentifierURI:
       type: string
       description: "URI defining a party such as a person or organization"
-      example: "https://nuts.nl/identities/agb#00000007"
+      example: "urn:oid:2.16.840.1.113883.2.4.6.1:#00000007"
     ActorURI:
       type: string
       description: "URI defining the actor, usually a practitioner"
-      example: "https://nuts.nl/identities/agb#00000007"
+      example: "urn:oid:2.16.840.1.113883.2.4.6.1:00000007"
     CustodianURI:
       type: string
       description: "URI defining an organization, usually the custodian or actor"
-      example: "https://nuts.nl/identities/agb#00000000"
+      example: "urn:oid:2.16.840.1.113883.2.4.6.1:00000000"
     SubjectURI:
       type: string
       description: "URI defining the data subject, usually the patient"
-      example: "https://nuts.nl/identities/bsn#999999990"
+      example: "urn:oid:2.16.840.1.113883.2.4.6.3:999999990"
