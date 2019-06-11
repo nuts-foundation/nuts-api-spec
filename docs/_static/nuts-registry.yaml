@@ -46,7 +46,7 @@ paths:
                 example: "Missing parameter actorId"
   /api/organization/{id}:
     get:
-      summary: Get organization bij id
+      summary: "Get organization by id"
       operationId: organizationById
       tags:
         - organizations
@@ -71,9 +71,31 @@ paths:
             text/plain:
               schema:
                 type: string
+    delete:
+      summary: "Remove organization by id"
+      operationId: deregisterOrganization
+      tags:
+        - organizations
+      parameters:
+        - name: id
+          in: path
+          description: "URL encoded identifier"
+          required: true
+          example: "urn:oid:2.16.840.1.113883.2.4.6.1:00000007"
+          schema:
+            type: string
+      responses:
+        '202':
+          description: "OK response"
+        '404':
+          description: "Unknown organization"
+          content:
+            text/plain:
+              schema:
+                type: string
   /api/organizations:
     get:
-      summary: Search for organizations
+      summary: "Search for organizations"
       operationId: searchOrganizations
       tags:
         - organizations
@@ -100,6 +122,26 @@ paths:
               example: No search query given
               schema:
                 type: string
+    post:
+      summary: "Add an organization to the registry"
+      operationId: "registerOrganization"
+      tags:
+        - organizations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Organization'
+      responses:
+        '201':
+          description: "Organization has been created successfully"
+        '400':
+          description: "incorrect data"
+          content:
+            text/plain:
+              example:
+                "Organization with identifier 00000007 already registered"
   /api/endpoints:
     get:
       summary: Find endpoints based on organisation identifiers and type of endpoint (optional)
@@ -177,6 +219,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Actor"
+        endpoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/Endpoint"
         publicKey:
           type: string
           description: "PEM encoded public key"
