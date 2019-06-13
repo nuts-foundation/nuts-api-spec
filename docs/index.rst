@@ -24,6 +24,7 @@ Back to main documentation: :ref:`nuts-documentation`
                     {url: "_static/nuts-registry.yaml", name: "nuts-registry"},
                     {url: "_static/nuts-service-crypto.yaml", name: "crypto"},
                     {url: "_static/nuts-auth.yaml", name: "auth"},
+                    {url: "_static/nuts-consent-store.yaml", name: "consent-store"},
                     ],
                 presets: [
                     SwaggerUIBundle.presets.apis,
