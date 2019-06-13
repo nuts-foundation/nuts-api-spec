@@ -23,7 +23,7 @@ Back to main documentation: :ref:`nuts-documentation`
                     {url: "_static/nuts-fhir-validation.yaml", name: "fhir-validation"},
                     {url: "_static/nuts-registry.yaml", name: "nuts-registry"},
                     {url: "_static/nuts-service-crypto.yaml", name: "crypto"},
-                    {url: "https://nuts-documentation.readthedocs.io/projects/nuts-service-proxy/en/" + READTHEDOCS_DATA.version + "/_static/openapi-spec.yaml", name: "auth"}
+                    {url: "_static/nuts-auth.yaml", name: "auth"},
                     ],
                 presets: [
                     SwaggerUIBundle.presets.apis,
