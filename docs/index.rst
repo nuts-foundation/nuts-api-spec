@@ -21,7 +21,7 @@ Back to main documentation: :ref:`nuts-documentation`
                     {url: "_static/nuts-consent-bridge.yaml", name: "consent-bridge"},
                     {url: "_static/nuts-consent-logic.yaml", name: "consent-logic"},
                     {url: "_static/nuts-fhir-validation.yaml", name: "fhir-validation"},
-                    {url: "_static/nuts-registry.yaml", name: "nuts-registry"},
+                    {url: "_static/nuts-registry.yaml", name: "registry"},
                     {url: "_static/nuts-service-crypto.yaml", name: "crypto"},
                     {url: "_static/nuts-auth.yaml", name: "auth"},
                     {url: "_static/nuts-consent-store.yaml", name: "consent-store"},

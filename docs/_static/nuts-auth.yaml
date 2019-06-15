@@ -3,61 +3,72 @@ info:
   title: Nuts Service API Proxy
   version: 0.0.1
 paths:
-  /auth/contract/validate:
+  /auth/contract/session:
+    post:
+      summary: CreateSessionHandler Initiates an IRMA signing session with the correct contract.
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContractSigningRequest"
+      responses:
+        '400':
+          description: the given information is invalid
+          content:
+            text/plain:
+              example: could not find contract with this type, language and version
+        '201':
+          description: session with given info for signature has been created and resulting info can be used to render a QR code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSessionResult"
+  /auth/contract/session/{id}:
     get:
-      summary: Validate a Nuts Security Contract
+      summary: returns the result of the contract request
       tags:
         - auth
       parameters:
-        - name: type
-          required: false
-          in: query
-          description: Define the contract type. Currently we only support IMRA.
-          schema:
-            type: string
-            default: IRMA
-        - name: token
+        - name: id
+          in: path
           required: true
-          description: BASE64 encoded token
-          in: query
           schema:
             type: string
+      responses:
+        '200':
+          description: The result contains session information such as the session status, type, possible errors and disclosed attributes or attribute-based signature if appropriate to the session type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionResult"
+        '404':
+          description: session id not found
+  /auth/contract/validate:
+    post:
+      summary: Validate a Nuts Security Contract
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidationRequest"
       responses:
         '200':
           description: if the token is valid
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  signature:
-                    type: object
-                    example:
-                      text: "ik ga akkoord"
-                      period:
-                        from: '2019-02-26T10:10:15'
-                        to: 'infinity'
-                      purpose: giving-care
-                      language: nl
-                      version: v1
-                      acting_party: Helder
-                  signer_attributes:
-                    type: object
-                    example: {
-                      "irma-demo.MijnOverheid.ageLower.over12": "yes",
-                      "irma-demo.MijnOverheid.fullName": "present"}
-        '403':
-          description: if the token is invalid
+                $ref: "#/components/schemas/ValidationResult"
+        '400':
+          description: the given information is invalid
           content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: string
-                    example: ['Invalid signature', 'Signature Expired']
+            text/plain:
+              example: could not decode json
   /auth/contract/{type}:
     get:
       summary: Get a contract by type and version
@@ -89,21 +100,253 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    example: login
-                  version:
-                    type: string
-                    example: v1
-                  signer_attributes:
-                    type: array
-                    items:
-                      type: string
-                      example: [ "irma-demo.MijnOverheid.ageLower.over12",
-                                 "irma-demo.MijnOverheid.fullName"
-                      ]
-                  template:
-                    type: string
-                    example: ik verklaar dat ${acting_party} namens mij request mag maken
+                $ref: "#/components/schemas/Contract"
+components:
+  schemas:
+    Type:
+      type: string
+      description: "Type of which contract to sign"
+      example: "BehandelaarLogin"
+    Language:
+      type: string
+      description: "Language of the contract in all caps"
+      example: "NL"
+    Version:
+      type: string
+      description: "Version of the contract"
+      example: "v1"
+    Contract:
+      required:
+        - type
+        - version
+        - language
+      properties:
+        type:
+          $ref: "#/components/schemas/Type"
+        language:
+          $ref: "#/components/schemas/Language"
+        version:
+          $ref: "#/components/schemas/Version"
+        signer_attributes:
+          type: array
+          example:
+          items:
+            type: string
+        template:
+          type: string
+          example: ik verklaar dat ${acting_party} namens mij request mag maken
+        template_attributes:
+          type: array
+          items:
+            type: string
+          example: [ "irma-demo.MijnOverheid.ageLower.over12",
+                     "irma-demo.MijnOverheid.fullName"
+          ]
+    ContractSigningRequest:
+      required:
+        - type
+        - version
+        - language
+      properties:
+        type:
+          $ref: "#/components/schemas/Type"
+        language:
+          $ref: "#/components/schemas/Language"
+        version:
+          $ref: "#/components/schemas/Version"
+        valid_from:
+          type: string
+          format: 'date-time'
+          description: "ValidFrom describes the time from which this contract should be considered valid"
+          example: "Monday, 2 January 2006 15:04:05"
+        valid_to:
+          type: string
+          format: 'date-time'
+          description: "ValidTo describes the time until this contract should be considered valid"
+          example: "Monday, 2 January 2006 15:04:05"
+    CreateSessionResult:
+      description: CreateSessionResult contains the results needed to setup an irma flow
+      required:
+        - qr_code_info
+        - session_id
+      properties:
+        qr_code_info:
+          $ref: "#/components/schemas/IrmaQR"
+        session_id:
+          type: string
+          description: a session identifier
+    IrmaQR:
+      description: Qr contains the data of an IRMA session QR (as generated by irma_js), suitable for NewSession()
+      required:
+        - u
+        - irmaqr
+      properties:
+        u:
+          type: string
+          description: Server with which to perform the session (URL)
+        irmaqr:
+          type: string
+          enum: [disclosing, signing, issuing]
+    ValidationRequest:
+      properties:
+        contract_format:
+          description: ContractFormat specifies the type of format used for the contract, e.g. 'irma'
+          type: string
+        contract_string:
+          description: Base64 encoded Irma contracts
+          type : string
+        acting_party_cn:
+          description: ActingPartyCN is the common name of the Acting party extracted from the client cert
+          type: string
+    ValidationResult:
+      properties:
+        validation_result:
+          type: string
+          enum: [VALID, INVALID]
+        contract_format:
+          type: string
+        signer_attributes:
+          type: object
+          additionalProperties:
+            type: string
+          example: {
+            "irma-demo.MijnOverheid.ageLower.over12": "yes",
+            "irma-demo.MijnOverheid.fullName": "present"}
+    SessionResult:
+      description: result of irma signature request, including disclosed attributes or errors
+      required:
+        - token
+        - status
+        - type
+      properties:
+        token:
+          type: string
+          description: the token originally given in the request
+        status:
+          type: string
+          enum: [INITIALIZED, CONNECTED, CANCELLED, DONE, TIMEOUT]
+        type:
+          type: string
+        proofStatus:
+          type: string
+          enum: [VALID, INVALID, INVALID_TIMESTAMP, UNMATCHED_REQUEST, MISSING_ATTRIBUTES, EXPIRED]
+        disclosed:
+          type: array
+          items:
+            $ref: "#/components/schemas/DisclosedAttribute"
+        signature:
+          $ref: "#/components/schemas/SignedMessage"
+        error:
+          $ref: "#/components/schemas/RemoteError"
+    DisclosedAttribute:
+      required:
+        - value
+        - id
+        - status
+      properties:
+        rawvalue:
+          type: string
+        value:
+          type: object
+          additionalProperties:
+            type: string
+        id:
+          type: string
+        status:
+          type: string
+          enum: [PRESENT, EXTRA, MISSING, INVALID_VALUE]
+        signature:
+          $ref: "#/components/schemas/SignedMessage"
+        error:
+          $ref: "#/components/schemas/RemoteError"
+    RemoteError:
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+        description:
+          type: string
+        message:
+          type: string
+        stacktrace:
+          type: string
+    SignedMessage:
+      properties:
+        signature:
+          type: array
+          items:
+            $ref: "#/components/schemas/Proof"
+        indices:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/DisclosedAttributeIndex"
+        nonce:
+          type: number
+        context:
+          type: number
+        message:
+          type: string
+        timestamp:
+          $ref: "#/components/schemas/Timestamp"
+    Proof:
+      oneOf:
+        - $ref: "#/components/schemas/ProofU"
+        - $ref: "#/components/schemas/ProofS"
+        - $ref: "#/components/schemas/ProofD"
+        - $ref: "#/components/schemas/ProofP"
+    DisclosedAttributeIndex:
+      properties:
+        cred:
+          type: integer
+        attr:
+          type: integer
+    Timestamp:
+      properties:
+        time:
+          type: integer
+          format: int64
+    ProofU:
+      properties:
+        U:
+          type: number
+        c:
+          type: number
+        v_prime_response:
+          type: number
+        s_response:
+          type: number
+    ProofP:
+      properties:
+        P:
+          type: number
+        c:
+          type: number
+        s_response:
+          type: number
+    ProofS:
+      properties:
+        c:
+          type: number
+        e_response:
+          type: number
+    ProofD:
+      properties:
+        c:
+          type: number
+        A:
+          type: number
+        e_response:
+          type: number
+        v_response:
+          type: number
+        a_responses:
+          type: object
+          additionalProperties:
+            type: number
+        a_disclosed:
+          type: object
+          additionalProperties:
+            type: number
