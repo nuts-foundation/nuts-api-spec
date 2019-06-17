@@ -190,10 +190,11 @@ components:
     ValidationRequest:
       properties:
         contract_format:
-          description: ContractFormat specifies the type of format used for the contract, e.g. 'irma'
+          description: ContractFormat specifies the type of format used for the contract
           type: string
+          enum: [irma, JWT]
         contract_string:
-          description: Base64 encoded Irma contracts
+          description: Base64 encoded contracts, either Irma signature or a JWT
           type : string
         acting_party_cn:
           description: ActingPartyCN is the common name of the Acting party extracted from the client cert
@@ -238,6 +239,9 @@ components:
           $ref: "#/components/schemas/SignedMessage"
         error:
           $ref: "#/components/schemas/RemoteError"
+        nuts_auth_token:
+          type: string
+          description: Base64 encoded JWT that can be used as Bearer Token
     DisclosedAttribute:
       required:
         - value
