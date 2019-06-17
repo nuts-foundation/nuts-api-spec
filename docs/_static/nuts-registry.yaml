@@ -189,6 +189,8 @@ components:
       properties:
         identifier:
           $ref: "#/components/schemas/Identifier"
+      example:
+        identifier: "urn:oid:2.16.840.1.113883.2.4.6.1:00000007"
     EndpointOrganization:
       description: "Mapping between Endpoints and Organizations"
       required:
@@ -256,12 +258,4 @@ components:
       description: >
         Generic identifier used for representing BSN, agbcode, etc.
         It's always constructed as an URN followed by a double colon (:) and then the identifying value of the given URN
-      example:
-        BSN:
-          value: urn:oid:2.16.840.1.113883.2.4.6.3:999999990
-        AGB:
-          value: urn:oid:2.16.840.1.113883.2.4.6.1:00000007
-        EndpointType:
-          value: urn:nuts:endpoint:consent
-        Certificate:
-          value: urn:ietf:rfc:1779:O=Nedap, OU=Healthcare, C=NL, ST=Gelderland, L=Groenlo, CN=nuts_corda_development_local
+      example: urn:oid:2.16.840.1.113883.2.4.6.3:999999990
