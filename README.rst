@@ -1,6 +1,8 @@
 nuts-node-rpc-spec
 ==================
 
+DEPRECATED
+
 Specification of models and methods used for intra node communication.
 
 .. inclusion-marker-for-contribution
